@@ -1,3 +1,5 @@
+[![AppVeyor](https://img.shields.io/appveyor/ci/StehlikC/tablet.svg)](https://ci.appveyor.com/project/StehlikC/tablet)
+
 # Tablet
 
 ![Tablet](http://media.giphy.com/media/JATUTMsZw2s5a/giphy.gif)
