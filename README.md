@@ -25,7 +25,7 @@ i.e.
     35\
       6a192b7913b04c54574d18c28d46e6395428ab
 ```
-**Needs Improvement: ** Instead of just hashing the key, it should probably hash ```"typeof(T) key"``` otherwise objects of different types will end in the same bucket.
+**Needs Improvement:** Instead of just hashing the key, it should probably hash ```"typeof(T) key"``` otherwise objects of different types will end in the same bucket.
 
 
 #### Performance
