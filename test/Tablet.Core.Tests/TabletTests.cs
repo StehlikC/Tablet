@@ -10,7 +10,7 @@ namespace Tablet.Core.Tests
     public class TabletTests
     {
         [Fact]
-        public void Init_GivenNoDirectory_CreatesFileStructureInCurrentDirectory()
+        public void Init_given_no_directory_path_it_creates_directory_structure_in_the_current_directory_path()
         {
             var mock = new MockFileSystem();
 
@@ -22,11 +22,10 @@ namespace Tablet.Core.Tests
 
             Assert.True(mock.Directory.Exists(@"C:\Temp\.tablet"), "Directory does not exist.");
             Assert.True(mock.Directory.Exists(@"C:\Temp\.tablet\objects"), "Directory does not exist.");
-            Assert.True(mock.Directory.Exists(@"C:\Temp\.tablet\sets"), "Directory does not exist.");
         }
 
         [Fact]
-        public void Init_GivenDirectory_CreatesFileStructureInThatDirectory()
+        public void Init_given_directory_path_it_creates_directory_structure_in_that_directory_path()
         {
             var mock = new MockFileSystem();
             
@@ -36,11 +35,10 @@ namespace Tablet.Core.Tests
 
             Assert.True(mock.Directory.Exists(@"C:\Temp\.tablet"), "Directory does not exist.");
             Assert.True(mock.Directory.Exists(@"C:\Temp\.tablet\objects"), "Directory does not exist.");
-            Assert.True(mock.Directory.Exists(@"C:\Temp\.tablet\sets"), "Directory does not exist.");
         }
 
         [Fact]
-        public void Init_WhenFileStructureAlreadyExists_ThrowsException()
+        public void Init_when_file_structure_exists_throws_exception()
         {
             var mock = new MockFileSystem();
 
@@ -52,7 +50,7 @@ namespace Tablet.Core.Tests
         }
 
         [Fact]
-        public void HashObject_StoresObjectInObjectsDirectory_ReturnsTheHash()
+        public void Push_when_no_bucket_exists_yet_creates_bucket_then_returns_hash()
         {
             var mock = new MockFileSystem();
 
@@ -62,14 +60,14 @@ namespace Tablet.Core.Tests
 
             sut.Init();
 
-            var actual = sut.HashObject<int>(1);
+            var p1 = sut.Push(new Fake { Value = 1 }, k => k.Value);
 
-            Assert.Equal("356a192b7913b04c54574d18c28d46e6395428ab", actual);
+            Assert.Equal("356a192b7913b04c54574d18c28d46e6395428ab", p1);
             Assert.True(mock.File.Exists(@"C:\Temp\.tablet\objects\35\6a192b7913b04c54574d18c28d46e6395428ab"), "File does not exist.");
         }
 
         [Fact]
-        public void HashObject_StoresCompressedDataInObjectsDirectory_ReturnsTheHash()
+        public void Push_when_bucket_exists_it_reads_the_bucket_and_adds_object_then_returns_hash()
         {
             var mock = new MockFileSystem();
 
@@ -79,14 +77,18 @@ namespace Tablet.Core.Tests
 
             sut.Init();
 
-            var actual = sut.HashObject<int>(1);
+            var p1 = sut.Push(new Fake { Value = 1 }, k => k.Value);
+            var p2 = sut.Push(new Fake { Value = 1 }, k => k.Value);
 
-            Assert.Equal("356a192b7913b04c54574d18c28d46e6395428ab", actual);
-            Assert.Equal("9996100969624815432264886412158224202226146212926120718818993514401231101248998781054237136199130", String.Join("", mock.File.ReadAllBytes(@"C:\Temp\.tablet\objects\35\6a192b7913b04c54574d18c28d46e6395428ab")));
+            Assert.Equal("356a192b7913b04c54574d18c28d46e6395428ab", p1);
+            Assert.True(mock.File.Exists(@"C:\Temp\.tablet\objects\35\6a192b7913b04c54574d18c28d46e6395428ab"), "File does not exist.");
+
+            Assert.Equal("356a192b7913b04c54574d18c28d46e6395428ab", p2);
+            Assert.True(mock.File.Exists(@"C:\Temp\.tablet\objects\35\6a192b7913b04c54574d18c28d46e6395428ab"), "File does not exist.");
         }
 
         [Fact]
-        public void HashObjectWithKey_StoresCompressedDataInKeyedObjectDirectory_ReturnsTheHash()
+        public void Get_when_bucket_exists_returns_list_of_objects_with_key()
         {
             var mock = new MockFileSystem();
 
@@ -96,32 +98,15 @@ namespace Tablet.Core.Tests
 
             sut.Init();
 
-            var actual = sut.HashObjectWithKey<Fake, string>(new Fake { Value = 1 }, k => Convert.ToString(k.Value));
+            sut.Push(new Fake { Value = 1 }, k => k.Value);
 
-            Assert.Equal("356a192b7913b04c54574d18c28d46e6395428ab", actual);
-            Assert.True(mock.File.Exists(@"C:\Temp\.tablet\sets\35\6a192b7913b04c54574d18c28d46e6395428ab"), "File does not exist.");
-        }
-
-        [Fact]
-        public void GetObjectSet_ReturnsEnumerableObjects()
-        {
-            var mock = new MockFileSystem();
-
-            mock.Directory.SetCurrentDirectory(@"C:\Temp");
-
-            var sut = new Tablet(mock);
-
-            sut.Init();
-
-            sut.HashObjectWithKey<Fake, string>(new Fake { Value = 1 }, k => Convert.ToString(k.Value));
-
-            var actual = sut.GetObjectSet<Fake, int>(1);
+            var actual = sut.Get<Fake, int>(1);
 
             Assert.Equal(new List<Fake> { new Fake { Value = 1 } }, actual, new FakeComparer());
         }
 
         [Fact]
-        public void GetObjectSet_WhenCalledTwice_ReturnsEnumerableBothObjects()
+        public void Get_when_bucket_exists_with_many_objects_returns_list_of_objects_with_key()
         {
             var mock = new MockFileSystem();
 
@@ -131,57 +116,57 @@ namespace Tablet.Core.Tests
 
             sut.Init();
 
-            sut.HashObjectWithKey<Fake, string>(new Fake { Value = 1 }, k => Convert.ToString(k.Value));
-            sut.HashObjectWithKey<Fake, string>(new Fake { Value = 1 }, k => Convert.ToString(k.Value));
+            sut.Push(new Fake { Value = 1 }, k => k.Value);
+            sut.Push(new Fake { Value = 1 }, k => k.Value);
 
-            var actual = sut.GetObjectSet<Fake, int>(1);
+            var actual = sut.Get<Fake, int>(1);
 
             Assert.Equal(new List<Fake> { new Fake { Value = 1 }, new Fake { Value = 1 } }, actual, new FakeComparer());
         }
 
-        [Fact(Skip="NCrunch Problems")]
-        public void HashObjectLoadTest()
+        [Fact(Skip = "Benchmark is touchy right now.")]
+        public void Get_load_test()
         {
-            if (Directory.Exists(@"C:\Temp"))
-                Directory.Delete(@"C:\Temp", true);
+            var mock = new MockFileSystem();
 
-            var sut = new Tablet(@"C:\Temp");
+            mock.Directory.SetCurrentDirectory(@"C:\Temp");
+
+            var sut = new Tablet(mock);
 
             sut.Init();
 
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();
 
-            for (int i = 0; i < 1000; i++)
+            const int numberToMake = 1000;
+
+            for (var i = 0; i < numberToMake; i++)
             {
-                sut.HashObjectWithKey<Fake, string>(new Fake { Value = 1 }, k => Convert.ToString(k.Value));
+                sut.Push(new Fake { Value = 1 }, k => k.Value);
             }
 
             watch.Stop();
 
-            Assert.True(watch.Elapsed < TimeSpan.FromSeconds(1));
-
-            //if (Directory.Exists(@"C:\Temp"))
-                //Directory.Delete(@"C:\Temp", true);
-        }
-    }
-
-    [Serializable]
-    public class Fake
-    {
-        public int Value { get; set; }
-    }
-
-    public class FakeComparer : IEqualityComparer<Fake>
-    {
-        public bool Equals(Fake x, Fake y)
-        {
-            return x.Value == y.Value;
+            Assert.Equal(numberToMake, sut.Get<Fake, int>(1).Count);
         }
 
-        public int GetHashCode(Fake obj)
+        [Serializable]
+        public class Fake
         {
-            return obj.GetHashCode();
+            public int Value { get; set; }
+        }
+
+        public class FakeComparer : IEqualityComparer<Fake>
+        {
+            public bool Equals(Fake x, Fake y)
+            {
+                return x.Value == y.Value;
+            }
+
+            public int GetHashCode(Fake obj)
+            {
+                return obj.GetHashCode();
+            }
         }
     }
 }
