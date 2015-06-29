@@ -1,15 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.IO.Abstractions;
+using System.IO.Compression;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text;
-using System.Linq;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO.Compression;
-using System.Collections;
-using System.Collections.Generic;
+using Tablet.Core.Metadata;
 
-namespace Tablet
+namespace Tablet.Core
 {
     public class Tablet
     {
@@ -54,7 +54,7 @@ namespace Tablet
             }
             else
             {
-                throw new TabletAlreadyInitializedException();
+                throw new AlreadyInitializedException();
             }
         }
 

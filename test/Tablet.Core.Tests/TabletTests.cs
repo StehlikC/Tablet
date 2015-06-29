@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
+using Tablet.Core.Metadata;
 using Xunit;
 
-namespace Tablet.Tests
+namespace Tablet.Core.Tests
 {
     public class TabletTests
     {
@@ -48,7 +48,7 @@ namespace Tablet.Tests
 
             var sut = new Tablet(@"C:\Temp", mock);
 
-            Assert.Throws<TabletAlreadyInitializedException>(() => sut.Init());
+            Assert.Throws<AlreadyInitializedException>(() => sut.Init());
         }
 
         [Fact]
@@ -139,7 +139,7 @@ namespace Tablet.Tests
             Assert.Equal(new List<Fake> { new Fake { Value = 1 }, new Fake { Value = 1 } }, actual, new FakeComparer());
         }
 
-        [Fact]
+        [Fact(Skip="NCrunch Problems")]
         public void HashObjectLoadTest()
         {
             if (Directory.Exists(@"C:\Temp"))
