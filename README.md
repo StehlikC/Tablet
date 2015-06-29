@@ -1,5 +1,7 @@
 # Tablet
 
+![Tablet](http://media.giphy.com/media/JATUTMsZw2s5a/giphy.gif)
+
 Tablet is a basic key-value store. Instead of storing everything in memory, it stores everything on disk.
 
 #### Repository
