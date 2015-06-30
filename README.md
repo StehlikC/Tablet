@@ -1,6 +1,4 @@
-[![AppVeyor](https://img.shields.io/appveyor/ci/StehlikC/tablet.svg)](https://ci.appveyor.com/project/StehlikC/tablet)
-
-# Tablet
+# Tablet [![Travis](https://img.shields.io/travis/StehlikC/Tablet.svg)](https://travis-ci.org/StehlikC/Tablet) [![AppVeyor](https://img.shields.io/appveyor/ci/StehlikC/tablet.svg)](https://ci.appveyor.com/project/StehlikC/tablet)
 
 ![Tablet](http://media.giphy.com/media/JATUTMsZw2s5a/giphy.gif)
 
