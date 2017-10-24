@@ -124,32 +124,6 @@ namespace Tablet.Core.Tests
             Assert.Equal(new List<Fake> { new Fake { Value = 1 }, new Fake { Value = 1 } }, actual, new FakeComparer());
         }
 
-        [Fact(Skip = "Benchmark is touchy right now.")]
-        public void Get_load_test()
-        {
-            var mock = new MockFileSystem();
-
-            mock.Directory.SetCurrentDirectory(@"C:\Temp");
-
-            var sut = new Tablet(mock);
-
-            sut.Init();
-
-            var watch = new System.Diagnostics.Stopwatch();
-            watch.Start();
-
-            const int numberToMake = 1000;
-
-            for (var i = 0; i < numberToMake; i++)
-            {
-                sut.Push(new Fake { Value = 1 }, k => k.Value);
-            }
-
-            watch.Stop();
-
-            Assert.Equal(numberToMake, sut.Get<Fake, int>(1).Count);
-        }
-
         [Serializable]
         public class Fake
         {
